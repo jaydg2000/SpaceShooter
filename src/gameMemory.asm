@@ -1,0 +1,8 @@
+#importonce
+
+.const zp_temp = $02
+
+.const sprite_number_player = $00
+.const timer_animate_player = $00
+.const screen_ram = $0400
+.const color_ram = $d800

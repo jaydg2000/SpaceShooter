@@ -1,0 +1,5 @@
+.label seedlo=$2001
+.label seedhi=$2000
+.label rand=$2002 {
+  .label noeor=$200d
+}

@@ -1,0 +1,3 @@
+.label SP0DATA=$7f8
+.label SP0COLOR=$d027
+.label spriteNumberMask=$2000
