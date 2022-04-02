@@ -19,14 +19,25 @@ main:
     player_init()
     load_screen()
     load_screen_colors()
-
+    enable_timer(timer_missile_move, $58)
     sei
+
+    // fire missle
+    // get_player_char_x()
+    // sta ZeroPage14
+    // sty ZeroPage13
+    // get_player_char_y()
+    // sta ZeroPage15
+    // create_missle(ZeroPage14,ZeroPage15,$00,ZeroPage13)
 loop:
-    vsync($FF)              // wait for frame to finish
+    vsync($FA)              // wait for frame to finish
     twinkle_stars()         // make the stars twinkle
     player_render()         // update player position    
     handle_player_input()   // move player with joystick movement
+    move_missiles()    
     jsr render_missiles
+    timer_tick(timer_missile_move)
+    timer_tick(timer_player_fire)
     jmp loop
     rts
 

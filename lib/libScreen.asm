@@ -1,5 +1,6 @@
 #importonce
 #import "libDefines.asm"
+#import "libMath.asm"
 
 wScreenRAMRowStart: // SCREENRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
     .word SCREENRAM,     SCREENRAM+40,  SCREENRAM+80,  SCREENRAM+120, SCREENRAM+160
@@ -29,11 +30,41 @@ libScreen_SetCharacter: {
     lda ZeroPage2
     asl                             // multiply by 2 as RAM addr stored in words
     tay
-    lda wScreenRAMRowStart,y        // low byte of screen RAM address
+    lda wScreenRAMRowStart,y        // low byte of screen RAM address    
     sta ZeroPage9
-    lda wScreenRAMRowStart+1,y      // high byte of screen RAM address
+    lda wColorRAMRowStart,y         // low byte of color RAM address
+    sta ZeroPage11 
+    lda wScreenRAMRowStart+1,y      // high byte of screen RAM address    
     sta ZeroPage10
+    lda wColorRAMRowStart+1,y       // high byte of color RAM address
+    sta ZeroPage12
     ldy ZeroPage1                   // x pos
     lda ZeroPage3                   // the character to display
     sta (ZeroPage9),y               // store char at the screen RAM addr
+    lda #WHITE                      // color of missile
+    sta (ZeroPage11),y    
+    rts
+}
+
+.macro libScreen_DisplayByte(bXPos, bYPos, bIn)
+{
+    libMath_8bitTObcd(bIn, ZeroPage4)
+    lda ZeroPage4
+    and #%00001111      // get low nibble
+    ora #$30            // convert to ascii
+    sta ZeroPage6
+    set_char_screen(bXPos+2, bYPos, ZeroPage6)
+    lda ZeroPage4
+    lsr                 // get high nibble
+    lsr
+    lsr
+    lsr
+    ora #$30            // convert to ascii
+    sta ZeroPage6
+    set_char_screen(bXPos+1, bYPos, ZeroPage6)
+    lda ZeroPage5
+    and #%00001111      // get low nibble
+    ora #$30            // convert to ascii
+    sta ZeroPage6
+    set_char_screen(bXPos, bYPos, ZeroPage6)
 }

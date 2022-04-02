@@ -3,7 +3,7 @@
 0801: 0b 08     -         
 0803: 0a 00     -         
 0805: 9e        -         
-0806: 34 38 37 35                                      -         
+0806: 34 39 34 39                                      -         
 080a: 00        -         
 080b: 00 00     - upstartEnd:
 
@@ -29,352 +29,463 @@
 11b8: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
 11d8: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
 11f8: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00                                                 
-1208: 00 04 28 04 50 04 78 04 a0 04                    - wScreenRAMRowStart:.word SCREENRAM,     SCREENRAM+40,  SCREENRAM+80,  SCREENRAM+120, SCREENRAM+160
-1212: c8 04 f0 04 18 05 40 05 68 05                    -         .word SCREENRAM+200, SCREENRAM+240, SCREENRAM+280, SCREENRAM+320, SCREENRAM+360
-121c: 90 05 b8 05 e0 05 08 06 30 06                    -         .word SCREENRAM+400, SCREENRAM+440, SCREENRAM+480, SCREENRAM+520, SCREENRAM+560
-1226: 58 06 80 06 a8 06 d0 06 f8 06                    -         .word SCREENRAM+600, SCREENRAM+640, SCREENRAM+680, SCREENRAM+720, SCREENRAM+760
-1230: 20 07 48 07 70 07 98 07 c0 07                    -         .word SCREENRAM+800, SCREENRAM+840, SCREENRAM+880, SCREENRAM+920, SCREENRAM+960
-123a: 00 d8 28 d8 50 d8 78 d8 a0 d8                    - wColorRAMRowStart:.word COLORRAM,     COLORRAM+40,  COLORRAM+80,  COLORRAM+120, COLORRAM+160
-1244: c8 d8 f0 d8 18 d9 40 d9 68 d9                    -         .word COLORRAM+200, COLORRAM+240, COLORRAM+280, COLORRAM+320, COLORRAM+360
-124e: 90 d9 b8 d9 e0 d9 08 da 30 da                    -         .word COLORRAM+400, COLORRAM+440, COLORRAM+480, COLORRAM+520, COLORRAM+560
-1258: 58 da 80 da a8 da d0 da f8 da                    -         .word COLORRAM+600, COLORRAM+640, COLORRAM+680, COLORRAM+720, COLORRAM+760
-1262: 20 db 48 db 70 db 98 db c0 db                    -         .word COLORRAM+800, COLORRAM+840, COLORRAM+880, COLORRAM+920, COLORRAM+960
-126c: a5 03     - libScreen_SetCharacter:lda ZeroPage2
-126e: 0a        -         asl                             // multiply by 2 as RAM addr stored in words
-126f: a8        -         tay
-1270: b9 08 12  -         lda wScreenRAMRowStart,y        // low byte of screen RAM address
-1273: 85 0a     -         sta ZeroPage9
-1275: b9 09 12  -         lda wScreenRAMRowStart+1,y      // high byte of screen RAM address
-1278: 85 0b     -         sta ZeroPage10
-127a: a4 02     -         ldy ZeroPage1                   // x pos
-127c: a5 04     -         lda ZeroPage3                   // the character to display
-127e: 91 0a     -         sta (ZeroPage9),y               // store char at the screen RAM addr
-1280: 00 00 00 00 00 00 00 00                          - missile_enable:.fill max_missiles, $00
-1288: 00 00 00 00 00 00 00 00                          - missile_char_x:.fill max_missiles, $00
-1290: 00 00 00 00 00 00 00 00                          - missile_char_y:.fill max_missiles, $00
-1298: 00 00 00 00 00 00 00 00                          - missile_dir:.fill max_missiles, $00
-12a0: 78 78 78 78 78 78 78 78                          - missile_char:.fill max_missiles, $78
-12a8: a2 00     - render_missiles:ldx #$00
-12aa: bd 80 12  - loop:   lda missile_enable,x
-12ad: f0 1e     -         beq next
-12af: bd 88 12  -         lda missile_char_x,x
-12b2: 85 02     -         sta ZeroPage1
-12b4: bd 90 12  -         lda missile_char_y,x
-12b7: 85 03     -         sta ZeroPage2
-12b9: bd a0 12  -         lda missile_char,x
-12bc: 85 04     -         sta ZeroPage3
-12be: a5 02     -         lda bXPos
-12c0: 85 02     -         sta ZeroPage1
-12c2: a5 03     -         lda bYPos
-12c4: 85 03     -         sta ZeroPage2
-12c6: a5 04     -         lda bChar
-12c8: 85 04     -         sta ZeroPage3
-12ca: 20 6c 12  -         jsr libScreen_SetCharacter
-12cd: e8        - next:   inx
-12ce: e0 08     -         cpx #max_missiles
-12d0: 90 d8     -         bcc loop
-12d2: 60        - end:    rts
-12d3: 00        - player_x_hi:.byte $00 //$00
-12d4: ff        - player_x_lo:.byte $ff //$af
-12d5: cd        - player_y:.byte $cd
-12d6: ad d3 12  - bound_player:lda player_x_hi
-12d9: d0 0f     -         bne testforhi
-12db: ad d4 12  -         lda player_x_lo
-12de: c9 11     -         cmp #$11
-12e0: b0 14     -         bcs end
-12e2: a9 11     -         lda #$11
-12e4: 8d d4 12  -         sta player_x_lo
-12e7: 4c f6 12  -         jmp end
-12ea: ad d4 12  - testforhi:lda player_x_lo
-12ed: c9 47     -         cmp #$47
-12ef: 90 05     -         bcc end
-12f1: a9 47     -         lda #$47
-12f3: 8d d4 12  -         sta player_x_lo
-12f6: 60        - end:    rts
-12f7: ff        - seedhi: .byte $FF
-12f8: ff        - seedlo: .byte $FF
-12f9: ad f7 12  - rand:   lda seedhi
-12fc: 4a        -         lsr
-12fd: 2e f8 12  -         rol seedlo            
-1300: 90 02     -         bcc noeor             
-1302: 49 b4     -         eor #$B4              
-1304: 8d f7 12  - noeor:  sta seedhi            
-1307: 4d f8 12  -         eor seedlo 
-130a: 60        -         rts
-130b: a9 00     - main:   lda #bColor
-130d: 8d 21 d0  -         sta $d021 
-1310: a9 00     -         lda #bColor
-1312: 8d 20 d0  -         sta $d020
-1315: ad 18 d0  -         lda $D018
-1318: 29 f0     -         and #$F0        // don't disturb the upper 4 bits
-131a: 09 0e     -         ora #bBlock
-131c: 8d 18 d0  -         sta $D018
-131f: a9 0a     -         lda #nColor0
-1321: 8d 25 d0  -         sta $d025
-1324: a9 03     -         lda #nColor1
-1326: 8d 26 d0  -         sta $d026
-1329: a0 00     -         ldy #nSpriteNumber
-132b: ad 15 d0  -         lda SP0ENABLE
-132e: 19 20 10  -         ora spriteNumberMask,y
-1331: 8d 15 d0  -         sta SP0ENABLE
-1334: a0 00     -         ldy #nSpriteNumber
-1336: a9 80     -         lda #bBlock
-1338: 99 18 10  -         sta spriteDataPtr,y
-133b: 99 f8 07  -         sta SP0DATA,y
-133e: a0 00     -         ldy #nSpriteNumber
-1340: ad 1c d0  -         lda $d01c
-1343: 19 20 10  -         ora spriteNumberMask,y
-1346: 8d 1c d0  -         sta $d01c
-1349: a0 00     -         ldy #nSpriteNumber
-134b: a9 0f     -         lda #nColor
-134d: 99 27 d0  -         sta SP0COLOR,y
-1350: a0 00     -         ldy #nSpriteNumber
-1352: a9 01     -         lda #nFrames
-1354: 99 00 10  -         sta spriteAnimationFrameCount,y
-1357: a9 00     -         lda #$00
-1359: 99 08 10  -         sta spriteAnimationCurrentFrame,y
-135c: b9 18 10  -         lda spriteDataPtr,y
-135f: 99 10 10  -         sta spriteAnimationCurrentDataPtr,y
-1362: a0 00     -         ldy #nTimer
-1364: a9 03     -         lda #nMax
-1366: 99 28 10  -         sta timer_max,y
-1369: a9 00     -         lda #$00
-136b: 99 18 11  -         sta timer,y
-136e: a2 00     -         ldx #$00
-1370: bd 00 22  -         lda screen_data_1,x
-1373: 9d 00 04  -         sta $0400,x
-1376: bd 00 23  -         lda screen_data_2,x
-1379: 9d 00 05  -         sta $0500,x
-137c: bd 00 24  -         lda screen_data_3,x
-137f: 9d 00 06  -         sta $0600,x    
-1382: e0 ff     -         cpx #$ff
-1384: f0 04     -         beq final
-1386: e8        -         inx
-1387: 4c 70 13  -         jmp !loop-    
-138a: a2 e7     - final:  ldx #$e7
-138c: bd 00 25  -         lda screen_data_4,x
-138f: 9d 00 07  -         sta $0700,x    
-1392: e0 00     -         cpx #$00    
-1394: f0 04     -         beq end
-1396: ca        -         dex
-1397: 4c 8c 13  -         jmp !loop-
-139a: a2 00     - end:    ldx #$00
-139c: bd e8 25  -         lda color_data_1,x
-139f: 9d 00 d8  -         sta color_ram,x
-13a2: bd e8 26  -         lda color_data_2,x
-13a5: 9d 00 d9  -         sta color_ram+256,x
-13a8: bd e8 27  -         lda color_data_3,x
-13ab: 9d 00 da  -         sta color_ram+512,x    
-13ae: e0 ff     -         cpx #$ff
-13b0: f0 04     -         beq final
-13b2: e8        -         inx
-13b3: 4c 9c 13  -         jmp !loop-    
-13b6: a2 e7     - final:  ldx #$e7
-13b8: bd e8 28  -         lda color_data_4,x
-13bb: 9d 00 db  -         sta color_ram+768,x    
-13be: e0 00     -         cpx #$00    
-13c0: f0 04     -         beq end
-13c2: ca        -         dex
-13c3: 4c b8 13  -         jmp !loop-
-13c6: 78        - end:    sei
-13c7: ad 12 d0  - loop,wait_loop:lda $D012
-13ca: c9 ff     -         cmp #nScanline
-13cc: d0 f9     -         bne wait_loop
-13ce: a2 ff     -         ldx #$FF
-13d0: bd 00 04  - loop:   lda $0400,x             
-13d3: c9 2e     -         cmp #$2E
-13d5: d0 27     -         bne bank2
-13d7: 20 f9 12  -         jsr rand
-13da: c9 05     -         cmp #$05
-13dc: 90 17     -         bcc white
-13de: c9 0a     -         cmp #$0A
-13e0: 90 0e     -         bcc gray
-13e2: c9 0f     -         cmp #$0F
-13e4: 90 05     -         bcc blue
-13e6: a9 ff     -         lda #$FF
-13e8: 4c f7 13  -         jmp end
-13eb: a9 06     - blue:   lda #color_blue
-13ed: 4c f7 13  -         jmp end
-13f0: a9 0c     - gray:   lda #color_gray_2
-13f2: 4c f7 13  -         jmp end
-13f5: a9 01     - white:  lda #color_white
-13f7: c9 ff     - end:    cmp #$FF
-13f9: f0 03     -         beq bank2
-13fb: 9d 00 d8  -         sta $D800,x
-13fe: bd 00 05  - bank2:  lda $0500,x
-1401: c9 2e     -         cmp #$2E
-1403: d0 27     -         bne bank3
-1405: 20 f9 12  -         jsr rand
-1408: c9 05     -         cmp #$05
-140a: 90 17     -         bcc white
-140c: c9 0a     -         cmp #$0A
-140e: 90 0e     -         bcc gray
-1410: c9 0f     -         cmp #$0F
-1412: 90 05     -         bcc blue
-1414: a9 ff     -         lda #$FF
-1416: 4c 25 14  -         jmp end
-1419: a9 06     - blue:   lda #color_blue
-141b: 4c 25 14  -         jmp end
-141e: a9 0c     - gray:   lda #color_gray_2
-1420: 4c 25 14  -         jmp end
-1423: a9 01     - white:  lda #color_white
-1425: c9 ff     - end:    cmp #$FF
-1427: f0 03     -         beq bank3
-1429: 9d 00 d9  -         sta $D900,x
-142c: bd 00 06  - bank3:  lda $0600,x
-142f: c9 2e     -         cmp #$2E
-1431: d0 27     -         bne bank4
-1433: 20 f9 12  -         jsr rand
-1436: c9 05     -         cmp #$05
-1438: 90 17     -         bcc white
-143a: c9 0a     -         cmp #$0A
-143c: 90 0e     -         bcc gray
-143e: c9 0f     -         cmp #$0F
-1440: 90 05     -         bcc blue
-1442: a9 ff     -         lda #$FF
-1444: 4c 53 14  -         jmp end
-1447: a9 06     - blue:   lda #color_blue
-1449: 4c 53 14  -         jmp end
-144c: a9 0c     - gray:   lda #color_gray_2
-144e: 4c 53 14  -         jmp end
-1451: a9 01     - white:  lda #color_white
-1453: c9 ff     - end:    cmp #$FF
-1455: f0 03     -         beq bank4
-1457: 9d 00 da  -         sta $DA00,x        
-145a: e0 e7     - bank4:  cpx #$E7
-145c: b0 2e     -         bcs next
-145e: bd 00 07  -         lda $0700,x
-1461: c9 2e     -         cmp #$2E
-1463: d0 27     -         bne next
-1465: 20 f9 12  -         jsr rand
-1468: c9 05     -         cmp #$05
-146a: 90 17     -         bcc white
-146c: c9 0a     -         cmp #$0A
-146e: 90 0e     -         bcc gray
-1470: c9 0f     -         cmp #$0F
-1472: 90 05     -         bcc blue
-1474: a9 ff     -         lda #$FF
-1476: 4c 85 14  -         jmp end
-1479: a9 06     - blue:   lda #color_blue
-147b: 4c 85 14  -         jmp end
-147e: a9 0c     - gray:   lda #color_gray_2
-1480: 4c 85 14  -         jmp end
-1483: a9 01     - white:  lda #color_white
-1485: c9 ff     - end:    cmp #$FF
-1487: f0 03     -         beq next
-1489: 9d 00 db  -         sta $DB00,x
-148c: ca        - next:   dex
-148d: f0 03     -         beq end
-148f: 4c d0 13  -         jmp loop
-1492: a0 00     - end:    ldy #nSpriteNumber
-1494: ad d3 12  -         lda bHiByteX                // check the hi byte of the X position
-1497: d0 0f     -         bne setXMSB                 // if not zero, set the XMSB bit    
-1499: b9 20 10  -         lda spriteNumberMask,y      // otherwise load the XMSB bits 
-149c: 4d 10 d0  -         eor $d010                   // get the inverse of the mask
-149f: 2d 10 d0  -         and $d010                   // and with the XMSB bits to turn it off
-14a2: 8d 10 d0  -         sta $d010                   // store back to XMSB register
-14a5: 4c b1 14  -         jmp setX                    // go set the X position of the sprite
-14a8: ad 10 d0  - setXMSB:lda $d010                   // load XMSB register
-14ab: 19 20 10  -         ora spriteNumberMask,y      // turn on specific sprite XMSB bit
-14ae: 8d 10 d0  -         sta $d010                   // store back to XMSB register
-14b1: ad d4 12  - setX:   lda bLoByteX                // load A with sprite X low byte
-14b4: 99 00 d0  -         sta $d000,y                 // A should be preloaded with true X
-14b7: ad d5 12  - setY:   lda bY
-14ba: 8d 01 d0  -         sta $d001
-14bd: a2 00     -         ldx #nTimer
-14bf: bd 18 11  -         lda timer,x
-14c2: dd 28 10  -         cmp timer_max,x
-14c5: b0 03     -         bcs end
-14c7: fe 18 11  -         inc timer,x
-14ca: a2 00     - end:    ldx #$00
-14cc: a0 00     -         ldy #nTimer
-14ce: b9 18 11  -         lda timer,y
-14d1: d9 28 10  -         cmp timer_max,y             // check carry flag BCS for timer has elapsed, 
-14d4: 90 2b     -         bcc end
-14d6: a2 00     -         ldx #nSpriteNumber
-14d8: bd 08 10  -         lda spriteAnimationCurrentFrame,x
-14db: dd 00 10  -         cmp spriteAnimationFrameCount,x
-14de: 90 0e     -         bcc next
-14e0: bd 18 10  -         lda spriteDataPtr,x
-14e3: 9d 10 10  -         sta spriteAnimationCurrentDataPtr,x
-14e6: a9 00     -         lda #$00
-14e8: 9d 08 10  -         sta spriteAnimationCurrentFrame,x
-14eb: 4c f4 14  -         jmp end
-14ee: fe 08 10  - next:   inc spriteAnimationCurrentFrame,x    
-14f1: fe 10 10  -         inc spriteAnimationCurrentDataPtr,x
-14f4: bd 10 10  - end:    lda spriteAnimationCurrentDataPtr,x
-14f7: 9d f8 07  -         sta SP0DATA,x
-14fa: a0 00     -         ldy #nTimer
-14fc: a9 00     -         lda #$00
-14fe: 99 18 11  -         sta timer,y
-1501: ad 00 dc  - end,check_left:lda CIAPRA      // Load joystick 2 state to A
-1504: 29 04     -         and #bPortMask  // Mask out direction/fire required
-1506: d0 1a     -         bne check_right
-1508: 38        -         sec
-1509: ad d4 12  -         lda player_x_lo
-150c: e9 03     -         sbc #nPixels
-150e: 8d d4 12  -         sta player_x_lo    
-1511: ad d3 12  -         lda player_x_hi
-1514: e9 00     -         sbc #$00
-1516: 8d d3 12  -         sta player_x_hi
-1519: ae d4 12  -         ldx player_x_lo    
-151c: 20 d6 12  -         jsr bound_player
-151f: 4c 94 15  -         jmp end
-1522: ad 00 dc  - check_right:lda CIAPRA      // Load joystick 2 state to A
-1525: 29 08     -         and #bPortMask  // Mask out direction/fire required
-1527: d0 15     -         bne check_fire
-1529: 18        -         clc
-152a: ad d4 12  -         lda player_x_lo
-152d: 69 03     -         adc #nPixels
-152f: 8d d4 12  -         sta player_x_lo
-1532: aa        -         tax                     // keep the low byte in X for bounds checking
-1533: ad d3 12  -         lda player_x_hi
-1536: 69 00     -         adc #$00
-1538: 8d d3 12  -         sta player_x_hi    
-153b: 20 d6 12  -         jsr bound_player
-153e: ad 00 dc  - check_fire:lda CIAPRA      // Load joystick 2 state to A
-1541: 29 10     -         and #bPortMask  // Mask out direction/fire required
-1543: d0 4f     -         bne end
-1545: 38        -         sec                 // subtract 24
-1546: ad d4 12  -         lda player_x_lo
-1549: e9 18     -         sbc #$18
-154b: 85 02     -         sta ZeroPage1
-154d: ad d3 12  -         lda player_x_hi
-1550: e9 00     -         sbc #$00
-1552: 85 03     -         sta ZeroPage2
-1554: 46 03     -         lsr ZeroPage2       // divide by 8
-1556: 66 02     -         ror ZeroPage1
-1558: 46 03     -         lsr ZeroPage2
-155a: 66 02     -         ror ZeroPage1
-155c: 46 03     -         lsr ZeroPage2
-155e: 66 02     -         ror ZeroPage1
-1560: a5 02     -         lda ZeroPage1       // A will have X char pos
-1562: 85 0f     -         sta ZeroPage14
-1564: 38        -         sec                 // subtract 50
-1565: ad d5 12  -         lda player_y
-1568: e9 32     -         sbc #$32
-156a: 85 02     -         sta ZeroPage1
-156c: 46 02     -         lsr ZeroPage1       // divide by 8
-156e: 46 02     -         lsr ZeroPage1
-1570: 46 02     -         lsr ZeroPage1    
-1572: a5 02     -         lda ZeroPage1       // A will have Y char pos
-1574: 85 10     -         sta ZeroPage15
-1576: a2 00     -         ldx #$00
-1578: bd 80 12  - loop:   lda missile_enable,x
-157b: f0 08     -         beq create
-157d: e0 08     -         cpx #max_missiles
-157f: f0 13     -         beq end
-1581: e8        -         inx
-1582: 4c 78 15  -         jmp loop
-1585: a9 0f     - create: lda #charX
-1587: 9d 88 12  -         sta missile_char_x,x
-158a: a9 10     -         lda #charY
-158c: 9d 90 12  -         sta missile_char_y,x
-158f: a9 00     -         lda #dir
-1591: 9d 98 12  -         sta missile_dir,x
-1594: 20 a8 12  - end,end:jsr render_missiles
-1597: 4c c7 13  -         jmp loop
-159a: 60        -         rts
+1208: ff        - seedhi: .byte $FF
+1209: ff        - seedlo: .byte $FF
+120a: ad 08 12  - rand:   lda seedhi
+120d: 4a        -         lsr
+120e: 2e 09 12  -         rol seedlo            
+1211: 90 02     -         bcc noeor             
+1213: 49 b4     -         eor #$B4              
+1215: 8d 08 12  - noeor:  sta seedhi            
+1218: 4d 09 12  -         eor seedlo 
+121b: 60        -         rts
+121c: 00 04 28 04 50 04 78 04 a0 04                    - wScreenRAMRowStart:.word SCREENRAM,     SCREENRAM+40,  SCREENRAM+80,  SCREENRAM+120, SCREENRAM+160
+1226: c8 04 f0 04 18 05 40 05 68 05                    -         .word SCREENRAM+200, SCREENRAM+240, SCREENRAM+280, SCREENRAM+320, SCREENRAM+360
+1230: 90 05 b8 05 e0 05 08 06 30 06                    -         .word SCREENRAM+400, SCREENRAM+440, SCREENRAM+480, SCREENRAM+520, SCREENRAM+560
+123a: 58 06 80 06 a8 06 d0 06 f8 06                    -         .word SCREENRAM+600, SCREENRAM+640, SCREENRAM+680, SCREENRAM+720, SCREENRAM+760
+1244: 20 07 48 07 70 07 98 07 c0 07                    -         .word SCREENRAM+800, SCREENRAM+840, SCREENRAM+880, SCREENRAM+920, SCREENRAM+960
+124e: 00 d8 28 d8 50 d8 78 d8 a0 d8                    - wColorRAMRowStart:.word COLORRAM,     COLORRAM+40,  COLORRAM+80,  COLORRAM+120, COLORRAM+160
+1258: c8 d8 f0 d8 18 d9 40 d9 68 d9                    -         .word COLORRAM+200, COLORRAM+240, COLORRAM+280, COLORRAM+320, COLORRAM+360
+1262: 90 d9 b8 d9 e0 d9 08 da 30 da                    -         .word COLORRAM+400, COLORRAM+440, COLORRAM+480, COLORRAM+520, COLORRAM+560
+126c: 58 da 80 da a8 da d0 da f8 da                    -         .word COLORRAM+600, COLORRAM+640, COLORRAM+680, COLORRAM+720, COLORRAM+760
+1276: 20 db 48 db 70 db 98 db c0 db                    -         .word COLORRAM+800, COLORRAM+840, COLORRAM+880, COLORRAM+920, COLORRAM+960
+1280: a5 03     - libScreen_SetCharacter:lda ZeroPage2
+1282: 0a        -         asl                             // multiply by 2 as RAM addr stored in words
+1283: a8        -         tay
+1284: b9 1c 12  -         lda wScreenRAMRowStart,y        // low byte of screen RAM address    
+1287: 85 0a     -         sta ZeroPage9
+1289: b9 4e 12  -         lda wColorRAMRowStart,y         // low byte of color RAM address
+128c: 85 0c     -         sta ZeroPage11 
+128e: b9 1d 12  -         lda wScreenRAMRowStart+1,y      // high byte of screen RAM address    
+1291: 85 0b     -         sta ZeroPage10
+1293: b9 4f 12  -         lda wColorRAMRowStart+1,y       // high byte of color RAM address
+1296: 85 0d     -         sta ZeroPage12
+1298: a4 02     -         ldy ZeroPage1                   // x pos
+129a: a5 04     -         lda ZeroPage3                   // the character to display
+129c: 91 0a     -         sta (ZeroPage9),y               // store char at the screen RAM addr
+129e: a9 01     -         lda #WHITE                      // color of missile
+12a0: 91 0c     -         sta (ZeroPage11),y    
+12a2: 60        -         rts
+12a3: 00 00 00 00 00 00 00 00                          - missile_enable:.fill max_missiles, $00
+12ab: 00 00 00 00 00 00 00 00                          - missile_char_x:.fill max_missiles, $00
+12b3: 00 00 00 00 00 00 00 00                          - missile_char_y:.fill max_missiles, $00
+12bb: 00 00 00 00 00 00 00 00                          - missile_dir:.fill max_missiles, $00
+12c3: 78 78 78 78 78 78 78 78                          - missile_char:.fill max_missiles, missile_first_frame
+12cb: 78 78 78 79 78 7a 78 7b 78 7c 78 7d 78 7e 78 7f  - missile_frames:.fill max_missiles, [missile_first_frame,missile_first_frame+i]
+12db: a2 00     - render_missiles:ldx #$00
+12dd: bd a3 12  - loop:   lda missile_enable,x
+12e0: f0 1e     -         beq next
+12e2: bd ab 12  -         lda missile_char_x,x
+12e5: 85 02     -         sta ZeroPage1
+12e7: bd b3 12  -         lda missile_char_y,x
+12ea: 85 03     -         sta ZeroPage2
+12ec: bd c3 12  -         lda missile_char,x
+12ef: 85 04     -         sta ZeroPage3
+12f1: a5 02     -         lda bXPos
+12f3: 85 02     -         sta ZeroPage1
+12f5: a5 03     -         lda bYPos
+12f7: 85 03     -         sta ZeroPage2
+12f9: a5 04     -         lda bChar
+12fb: 85 04     -         sta ZeroPage3
+12fd: 20 80 12  -         jsr libScreen_SetCharacter
+1300: e8        - next:   inx
+1301: e0 08     -         cpx #max_missiles
+1303: 90 d8     -         bcc loop
+1305: 60        - end:    rts
+1306: a2 00     - erase_missiles:ldx #$00
+1308: bd a3 12  - loop:   lda missile_enable,x
+130b: f0 1d     -         beq next
+130d: bd ab 12  -         lda missile_char_x,x
+1310: 85 02     -         sta ZeroPage1
+1312: bd b3 12  -         lda missile_char_y,x
+1315: 85 03     -         sta ZeroPage2
+1317: a9 20     -         lda #$20
+1319: 85 04     -         sta ZeroPage3
+131b: a5 02     -         lda bXPos
+131d: 85 02     -         sta ZeroPage1
+131f: a5 03     -         lda bYPos
+1321: 85 03     -         sta ZeroPage2
+1323: a5 04     -         lda bChar
+1325: 85 04     -         sta ZeroPage3
+1327: 20 80 12  -         jsr libScreen_SetCharacter
+132a: e8        - next:   inx
+132b: e0 08     -         cpx #max_missiles
+132d: 90 d9     -         bcc loop
+132f: 60        - end:    rts
+1330: 00        - player_x_hi:.byte $00 //$00
+1331: ff        - player_x_lo:.byte $ff //$af
+1332: cd        - player_y:.byte $cd
+1333: 00        - player_firing:.byte $00 // 0=no, !0=yes
+1334: ad 30 13  - bound_player:lda player_x_hi
+1337: d0 0f     -         bne testforhi
+1339: ad 31 13  -         lda player_x_lo
+133c: c9 11     -         cmp #$11
+133e: b0 14     -         bcs end
+1340: a9 11     -         lda #$11
+1342: 8d 31 13  -         sta player_x_lo
+1345: 4c 54 13  -         jmp end
+1348: ad 31 13  - testforhi:lda player_x_lo
+134b: c9 47     -         cmp #$47
+134d: 90 05     -         bcc end
+134f: a9 47     -         lda #$47
+1351: 8d 31 13  -         sta player_x_lo
+1354: 60        - end:    rts
+1355: a9 00     - main:   lda #bColor
+1357: 8d 21 d0  -         sta $d021 
+135a: a9 00     -         lda #bColor
+135c: 8d 20 d0  -         sta $d020
+135f: ad 18 d0  -         lda $D018
+1362: 29 f0     -         and #$F0        // don't disturb the upper 4 bits
+1364: 09 0e     -         ora #bBlock
+1366: 8d 18 d0  -         sta $D018
+1369: a9 0a     -         lda #nColor0
+136b: 8d 25 d0  -         sta $d025
+136e: a9 03     -         lda #nColor1
+1370: 8d 26 d0  -         sta $d026
+1373: a0 00     -         ldy #nSpriteNumber
+1375: ad 15 d0  -         lda SP0ENABLE
+1378: 19 20 10  -         ora spriteNumberMask,y
+137b: 8d 15 d0  -         sta SP0ENABLE
+137e: a0 00     -         ldy #nSpriteNumber
+1380: a9 80     -         lda #bBlock
+1382: 99 18 10  -         sta spriteDataPtr,y
+1385: 99 f8 07  -         sta SP0DATA,y
+1388: a0 00     -         ldy #nSpriteNumber
+138a: ad 1c d0  -         lda $d01c
+138d: 19 20 10  -         ora spriteNumberMask,y
+1390: 8d 1c d0  -         sta $d01c
+1393: a0 00     -         ldy #nSpriteNumber
+1395: a9 0f     -         lda #nColor
+1397: 99 27 d0  -         sta SP0COLOR,y
+139a: a0 00     -         ldy #nSpriteNumber
+139c: a9 01     -         lda #nFrames
+139e: 99 00 10  -         sta spriteAnimationFrameCount,y
+13a1: a9 00     -         lda #$00
+13a3: 99 08 10  -         sta spriteAnimationCurrentFrame,y
+13a6: b9 18 10  -         lda spriteDataPtr,y
+13a9: 99 10 10  -         sta spriteAnimationCurrentDataPtr,y
+13ac: a0 00     -         ldy #nTimer
+13ae: a9 03     -         lda #nMax
+13b0: 99 28 10  -         sta timer_max,y
+13b3: a9 00     -         lda #$00
+13b5: 99 18 11  -         sta timer,y
+13b8: a0 01     -         ldy #nTimer
+13ba: a9 78     -         lda #nMax
+13bc: 99 28 10  -         sta timer_max,y
+13bf: a9 00     -         lda #$00
+13c1: 99 18 11  -         sta timer,y
+13c4: a2 00     -         ldx #$00
+13c6: bd 00 22  -         lda screen_data_1,x
+13c9: 9d 00 04  -         sta $0400,x
+13cc: bd 00 23  -         lda screen_data_2,x
+13cf: 9d 00 05  -         sta $0500,x
+13d2: bd 00 24  -         lda screen_data_3,x
+13d5: 9d 00 06  -         sta $0600,x    
+13d8: e0 ff     -         cpx #$ff
+13da: f0 04     -         beq final
+13dc: e8        -         inx
+13dd: 4c c6 13  -         jmp !loop-    
+13e0: a2 e7     - final:  ldx #$e7
+13e2: bd 00 25  -         lda screen_data_4,x
+13e5: 9d 00 07  -         sta $0700,x    
+13e8: e0 00     -         cpx #$00    
+13ea: f0 04     -         beq end
+13ec: ca        -         dex
+13ed: 4c e2 13  -         jmp !loop-
+13f0: a2 00     - end:    ldx #$00
+13f2: bd e8 25  -         lda color_data_1,x
+13f5: 9d 00 d8  -         sta color_ram,x
+13f8: bd e8 26  -         lda color_data_2,x
+13fb: 9d 00 d9  -         sta color_ram+256,x
+13fe: bd e8 27  -         lda color_data_3,x
+1401: 9d 00 da  -         sta color_ram+512,x    
+1404: e0 ff     -         cpx #$ff
+1406: f0 04     -         beq final
+1408: e8        -         inx
+1409: 4c f2 13  -         jmp !loop-    
+140c: a2 e7     - final:  ldx #$e7
+140e: bd e8 28  -         lda color_data_4,x
+1411: 9d 00 db  -         sta color_ram+768,x    
+1414: e0 00     -         cpx #$00    
+1416: f0 04     -         beq end
+1418: ca        -         dex
+1419: 4c 0e 14  -         jmp !loop-
+141c: a0 02     - end:    ldy #nTimer
+141e: a9 58     -         lda #nMax
+1420: 99 28 10  -         sta timer_max,y
+1423: a9 00     -         lda #$00
+1425: 99 18 11  -         sta timer,y
+1428: 78        -         sei
+1429: ad 12 d0  - loop,wait_loop:lda $D012
+142c: c9 fa     -         cmp #nScanline
+142e: d0 f9     -         bne wait_loop
+1430: a2 ff     -         ldx #$FF
+1432: bd 00 04  - loop:   lda $0400,x             
+1435: c9 2e     -         cmp #$2E
+1437: d0 27     -         bne bank2
+1439: 20 0a 12  -         jsr rand
+143c: c9 05     -         cmp #$05
+143e: 90 17     -         bcc white
+1440: c9 0a     -         cmp #$0A
+1442: 90 0e     -         bcc gray
+1444: c9 0f     -         cmp #$0F
+1446: 90 05     -         bcc blue
+1448: a9 ff     -         lda #$FF
+144a: 4c 59 14  -         jmp end
+144d: a9 06     - blue:   lda #color_blue
+144f: 4c 59 14  -         jmp end
+1452: a9 0c     - gray:   lda #color_gray_2
+1454: 4c 59 14  -         jmp end
+1457: a9 01     - white:  lda #color_white
+1459: c9 ff     - end:    cmp #$FF
+145b: f0 03     -         beq bank2
+145d: 9d 00 d8  -         sta $D800,x
+1460: bd 00 05  - bank2:  lda $0500,x
+1463: c9 2e     -         cmp #$2E
+1465: d0 27     -         bne bank3
+1467: 20 0a 12  -         jsr rand
+146a: c9 05     -         cmp #$05
+146c: 90 17     -         bcc white
+146e: c9 0a     -         cmp #$0A
+1470: 90 0e     -         bcc gray
+1472: c9 0f     -         cmp #$0F
+1474: 90 05     -         bcc blue
+1476: a9 ff     -         lda #$FF
+1478: 4c 87 14  -         jmp end
+147b: a9 06     - blue:   lda #color_blue
+147d: 4c 87 14  -         jmp end
+1480: a9 0c     - gray:   lda #color_gray_2
+1482: 4c 87 14  -         jmp end
+1485: a9 01     - white:  lda #color_white
+1487: c9 ff     - end:    cmp #$FF
+1489: f0 03     -         beq bank3
+148b: 9d 00 d9  -         sta $D900,x
+148e: bd 00 06  - bank3:  lda $0600,x
+1491: c9 2e     -         cmp #$2E
+1493: d0 27     -         bne bank4
+1495: 20 0a 12  -         jsr rand
+1498: c9 05     -         cmp #$05
+149a: 90 17     -         bcc white
+149c: c9 0a     -         cmp #$0A
+149e: 90 0e     -         bcc gray
+14a0: c9 0f     -         cmp #$0F
+14a2: 90 05     -         bcc blue
+14a4: a9 ff     -         lda #$FF
+14a6: 4c b5 14  -         jmp end
+14a9: a9 06     - blue:   lda #color_blue
+14ab: 4c b5 14  -         jmp end
+14ae: a9 0c     - gray:   lda #color_gray_2
+14b0: 4c b5 14  -         jmp end
+14b3: a9 01     - white:  lda #color_white
+14b5: c9 ff     - end:    cmp #$FF
+14b7: f0 03     -         beq bank4
+14b9: 9d 00 da  -         sta $DA00,x        
+14bc: e0 e7     - bank4:  cpx #$E7
+14be: b0 2e     -         bcs next
+14c0: bd 00 07  -         lda $0700,x
+14c3: c9 2e     -         cmp #$2E
+14c5: d0 27     -         bne next
+14c7: 20 0a 12  -         jsr rand
+14ca: c9 05     -         cmp #$05
+14cc: 90 17     -         bcc white
+14ce: c9 0a     -         cmp #$0A
+14d0: 90 0e     -         bcc gray
+14d2: c9 0f     -         cmp #$0F
+14d4: 90 05     -         bcc blue
+14d6: a9 ff     -         lda #$FF
+14d8: 4c e7 14  -         jmp end
+14db: a9 06     - blue:   lda #color_blue
+14dd: 4c e7 14  -         jmp end
+14e0: a9 0c     - gray:   lda #color_gray_2
+14e2: 4c e7 14  -         jmp end
+14e5: a9 01     - white:  lda #color_white
+14e7: c9 ff     - end:    cmp #$FF
+14e9: f0 03     -         beq next
+14eb: 9d 00 db  -         sta $DB00,x
+14ee: ca        - next:   dex
+14ef: f0 03     -         beq end
+14f1: 4c 32 14  -         jmp loop
+14f4: a0 00     - end:    ldy #nSpriteNumber
+14f6: ad 30 13  -         lda bHiByteX                // check the hi byte of the X position
+14f9: d0 0f     -         bne setXMSB                 // if not zero, set the XMSB bit    
+14fb: b9 20 10  -         lda spriteNumberMask,y      // otherwise load the XMSB bits 
+14fe: 4d 10 d0  -         eor $d010                   // get the inverse of the mask
+1501: 2d 10 d0  -         and $d010                   // and with the XMSB bits to turn it off
+1504: 8d 10 d0  -         sta $d010                   // store back to XMSB register
+1507: 4c 13 15  -         jmp setX                    // go set the X position of the sprite
+150a: ad 10 d0  - setXMSB:lda $d010                   // load XMSB register
+150d: 19 20 10  -         ora spriteNumberMask,y      // turn on specific sprite XMSB bit
+1510: 8d 10 d0  -         sta $d010                   // store back to XMSB register
+1513: ad 31 13  - setX:   lda bLoByteX                // load A with sprite X low byte
+1516: 99 00 d0  -         sta $d000,y                 // A should be preloaded with true X
+1519: ad 32 13  - setY:   lda bY
+151c: 8d 01 d0  -         sta $d001
+151f: a2 00     -         ldx #nTimer
+1521: bd 18 11  -         lda timer,x
+1524: dd 28 10  -         cmp timer_max,x
+1527: b0 03     -         bcs end
+1529: fe 18 11  -         inc timer,x
+152c: a2 00     - end:    ldx #$00
+152e: a0 00     -         ldy #nTimer
+1530: b9 18 11  -         lda timer,y
+1533: d9 28 10  -         cmp timer_max,y             // check carry flag BCS for timer has elapsed, 
+1536: 90 2b     -         bcc check_can_fire
+1538: a2 00     -         ldx #nSpriteNumber
+153a: bd 08 10  -         lda spriteAnimationCurrentFrame,x
+153d: dd 00 10  -         cmp spriteAnimationFrameCount,x
+1540: 90 0e     -         bcc next
+1542: bd 18 10  -         lda spriteDataPtr,x
+1545: 9d 10 10  -         sta spriteAnimationCurrentDataPtr,x
+1548: a9 00     -         lda #$00
+154a: 9d 08 10  -         sta spriteAnimationCurrentFrame,x
+154d: 4c 56 15  -         jmp end
+1550: fe 08 10  - next:   inc spriteAnimationCurrentFrame,x    
+1553: fe 10 10  -         inc spriteAnimationCurrentDataPtr,x
+1556: bd 10 10  - end:    lda spriteAnimationCurrentDataPtr,x
+1559: 9d f8 07  -         sta SP0DATA,x
+155c: a0 00     -         ldy #nTimer
+155e: a9 00     -         lda #$00
+1560: 99 18 11  -         sta timer,y
+1563: a2 00     - check_can_fire:ldx #$00
+1565: a0 01     -         ldy #nTimer
+1567: b9 18 11  -         lda timer,y
+156a: d9 28 10  -         cmp timer_max,y             // check carry flag BCS for timer has elapsed, 
+156d: 90 0c     -         bcc end
+156f: a9 00     -         lda #$00
+1571: 8d 33 13  -         sta player_firing
+1574: a0 01     -         ldy #nTimer
+1576: a9 00     -         lda #$00
+1578: 99 18 11  -         sta timer,y
+157b: ad 00 dc  - end,check_left:lda CIAPRA      // Load joystick 2 state to A
+157e: 29 04     -         and #bPortMask  // Mask out direction/fire required
+1580: d0 1a     -         bne check_right
+1582: 38        -         sec
+1583: ad 31 13  -         lda player_x_lo
+1586: e9 03     -         sbc #nPixels
+1588: 8d 31 13  -         sta player_x_lo    
+158b: ad 30 13  -         lda player_x_hi
+158e: e9 00     -         sbc #$00
+1590: 8d 30 13  -         sta player_x_hi
+1593: ae 31 13  -         ldx player_x_lo    
+1596: 20 34 13  -         jsr bound_player
+1599: 4c 3b 16  -         jmp end
+159c: ad 00 dc  - check_right:lda CIAPRA      // Load joystick 2 state to A
+159f: 29 08     -         and #bPortMask  // Mask out direction/fire required
+15a1: d0 15     -         bne check_fire
+15a3: 18        -         clc
+15a4: ad 31 13  -         lda player_x_lo
+15a7: 69 03     -         adc #nPixels
+15a9: 8d 31 13  -         sta player_x_lo
+15ac: aa        -         tax                     // keep the low byte in X for bounds checking
+15ad: ad 30 13  -         lda player_x_hi
+15b0: 69 00     -         adc #$00
+15b2: 8d 30 13  -         sta player_x_hi    
+15b5: 20 34 13  -         jsr bound_player
+15b8: ad 00 dc  - check_fire:lda CIAPRA      // Load joystick 2 state to A
+15bb: 29 10     -         and #bPortMask  // Mask out direction/fire required
+15bd: d0 7c     -         bne end
+15bf: a9 01     -         lda #$01
+15c1: 8d 33 13  -         sta player_firing 
+15c4: a0 01     -         ldy #nTimer
+15c6: a9 00     -         lda #$00
+15c8: 99 18 11  -         sta timer,y
+15cb: 38        -         sec                 // subtract 24-12 (offset half width of sprite)
+15cc: ad 31 13  -         lda player_x_lo
+15cf: e9 0c     -         sbc #$0C
+15d1: 85 02     -         sta ZeroPage1
+15d3: 85 04     -         sta ZeroPage3       // saving for calculating the offset    
+15d5: ad 30 13  -         lda player_x_hi
+15d8: e9 00     -         sbc #$00
+15da: 85 03     -         sta ZeroPage2
+15dc: 46 03     - divide: lsr ZeroPage2       // divide by 8
+15de: 66 02     -         ror ZeroPage1
+15e0: 46 03     -         lsr ZeroPage2
+15e2: 66 02     -         ror ZeroPage1
+15e4: 46 03     -         lsr ZeroPage2
+15e6: 66 02     -         ror ZeroPage1
+15e8: a5 02     - offset: lda ZeroPage1       // multiply char X by 8
+15ea: 85 05     -         sta ZeroPage4
+15ec: 06 05     -         asl ZeroPage4
+15ee: 26 05     -         rol ZeroPage4
+15f0: 26 05     -         rol ZeroPage4
+15f2: a5 04     -         lda ZeroPage3       // subtract char X * 8 from adjusted pixel X
+15f4: 38        -         sec
+15f5: e5 05     -         sbc ZeroPage4
+15f7: a8        -         tay
+15f8: a5 02     - done:   lda ZeroPage1       // A will have X char pos
+15fa: 85 0f     -         sta ZeroPage14
+15fc: 84 0e     -         sty ZeroPage13
+15fe: 38        -         sec                 // subtract 50
+15ff: ad 32 13  -         lda player_y
+1602: e9 32     -         sbc #$32
+1604: 85 02     -         sta ZeroPage1
+1606: 46 02     -         lsr ZeroPage1       // divide by 8
+1608: 46 02     -         lsr ZeroPage1
+160a: 46 02     -         lsr ZeroPage1    
+160c: a5 02     -         lda ZeroPage1       // A will have Y char pos
+160e: 85 10     -         sta ZeroPage15    
+1610: a2 00     -         ldx #$00
+1612: bd a3 12  - loop:   lda missile_enable,x
+1615: f0 08     -         beq create
+1617: e0 08     -         cpx #max_missiles
+1619: f0 18     -         beq setchar
+161b: e8        -         inx
+161c: 4c 12 16  -         jmp loop
+161f: a9 01     - create: lda #$01
+1621: 9d a3 12  -         sta missile_enable,x
+1624: a5 0f     -         lda charX
+1626: 9d ab 12  -         sta missile_char_x,x
+1629: a5 10     -         lda charY
+162b: 9d b3 12  -         sta missile_char_y,x
+162e: a9 00     -         lda #dir
+1630: 9d bb 12  -         sta missile_dir,x
+1633: a0 0e     - setchar:ldy #offset
+1635: b9 cb 12  -         lda missile_frames,y
+1638: 9d c3 12  -         sta missile_char,x
+163b: a2 00     - end:    ldx #$00
+163d: a0 02     -         ldy #nTimer
+163f: b9 18 11  -         lda timer,y
+1642: d9 28 10  -         cmp timer_max,y             // check carry flag BCS for timer has elapsed, 
+1645: 90 3e     -         bcc end
+1647: a0 02     -         ldy #nTimer
+1649: a9 00     -         lda #$00
+164b: 99 18 11  -         sta timer,y
+164e: 20 06 13  -         jsr erase_missiles 
+1651: a2 00     -         ldx #$00
+1653: bd a3 12  - loop:   lda missile_enable,x            // enabled?
+1656: f0 25     -         beq next
+1658: bd bb 12  -         lda missile_dir,x               // what direction is it moving?
+165b: d0 06     -         bne move_down
+165d: de b3 12  - move_up:dec missile_char_y,x
+1660: 4c 66 16  -         jmp check                       
+1663: fe b3 12  - move_down:inc missile_char_y,x
+1666: bd b3 12  - check:  lda missile_char_y,x            // check for out of bounds
+1669: c9 01     -         cmp #$01
+166b: f0 07     -         beq remove
+166d: c9 1a     -         cmp #$1A
+166f: f0 03     -         beq remove
+1671: 4c 85 16  -         jmp end
+1674: 86 02     - remove: stx ZeroPage1
+1676: a2 02     -         ldx #index
+1678: a9 00     -         lda #$00
+167a: 9d a3 12  -         sta missile_enable,x    
+167d: e8        - next:   inx
+167e: e0 08     -         cpx #max_missiles
+1680: f0 03     -         beq end
+1682: 4c 53 16  -         jmp loop
+1685: 20 db 12  - end:    jsr render_missiles
+1688: a2 02     -         ldx #nTimer
+168a: bd 18 11  -         lda timer,x
+168d: dd 28 10  -         cmp timer_max,x
+1690: b0 03     -         bcs end
+1692: fe 18 11  -         inc timer,x
+1695: a2 01     - end:    ldx #nTimer
+1697: bd 18 11  -         lda timer,x
+169a: dd 28 10  -         cmp timer_max,x
+169d: b0 03     -         bcs end
+169f: fe 18 11  -         inc timer,x
+16a2: 4c 29 14  - end:    jmp loop
+16a5: 60        -         rts
 
 [sprites]
 2000: 00 00 00 00 00 00 00 00 00 00 28 00 00 28 00 00 28 00 00 28 00 00 aa 00 00 be 00 00 be 00 00 be  -         .import binary "..\resources\player_sprites.bin"
