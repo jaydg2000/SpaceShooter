@@ -6,6 +6,9 @@ BasicUpstart(main)
 #import "gamePlayer.asm"
 #import "gameScreen.asm"
 
+// F6 - run
+// Shift F6 - debugger
+
 main:    
     // background
     background_color(color_black)
@@ -19,7 +22,7 @@ main:
     player_init()
     load_screen()
     load_screen_colors()
-    enable_timer(timer_missile_move, $58)
+    enable_timer(timer_missile_move, $05)
     sei
 
     // fire missle

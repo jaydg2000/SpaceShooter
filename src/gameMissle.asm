@@ -4,17 +4,18 @@
 #import "..\lib\libTimer.asm"
 #import "gameMemory.asm"
 
-.const max_missiles = $08
+.const max_missiles = $01
 .const missile_dir_up = $00
 .const missile_dir_down = $01
 .const missile_first_frame = $78
+.const missle_total_frames = $04
 
 missile_enable: .fill max_missiles, $00
 missile_char_x: .fill max_missiles, $00
 missile_char_y: .fill max_missiles, $00
 missile_dir:    .fill max_missiles, $00
 missile_char:   .fill max_missiles, missile_first_frame
-missile_frames: .fill max_missiles, [missile_first_frame,missile_first_frame+i]
+missile_frames: .fill missle_total_frames, [missile_first_frame,missile_first_frame+i]
 
 .macro create_missle(charX,charY,dir,offset) {
     ldx #$00
@@ -35,7 +36,7 @@ create:                             // slot found, create
     lda #dir
     sta missile_dir,x
 setchar:
-    ldy #offset
+    ldy offset
     lda missile_frames,y
     sta missile_char,x
 }
