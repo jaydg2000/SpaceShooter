@@ -9,6 +9,7 @@ player_x_hi:    .byte $00 //$00
 player_x_lo:    .byte $ff //$af
 player_y:       .byte $cd
 player_firing:  .byte $00 // 0=no, !0=yes
+firing_master:  .byte $00 // high order byte for firing timer
 
 .const player_MSB_mask = %00000001
 .const player_speed = $03
@@ -21,7 +22,7 @@ player_firing:  .byte $00 // 0=no, !0=yes
     sprite_animation_count(sprite_number_player, 1)   // count is 0 based, 1 = 2 frames.
 
     enable_timer(timer_animate_player, $03)
-    enable_timer(timer_player_fire, $78)
+    enable_timer(timer_player_fire, $10)
 }
 
 .macro player_render() {
@@ -34,6 +35,7 @@ player_firing:  .byte $00 // 0=no, !0=yes
 check_can_fire:
     timer_check(timer_player_fire)
     bcc end
+    timer_reset(timer_player_fire)
     lda #$00
     sta player_firing
     timer_reset(timer_player_fire)
@@ -96,6 +98,11 @@ check_right:
     player_move_right(player_speed)
 check_fire:
     joystick_read(GameportFireMask)
+    beq can_fire
+    jmp end
+can_fire:
+    lda player_firing
+    cmp #$00
     bne end
     lda #$01
     sta player_firing 

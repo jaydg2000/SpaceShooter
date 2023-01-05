@@ -4,7 +4,7 @@
 #import "..\lib\libTimer.asm"
 #import "gameMemory.asm"
 
-.const max_missiles = $01
+.const max_missiles = $04
 .const missile_dir_up = $00
 .const missile_dir_down = $01
 .const missile_first_frame = $78
@@ -54,7 +54,7 @@ loop:
     bne move_down
 move_up:                            // move Y pos up
     dec missile_char_y,x
-    jmp check                       
+    jmp check
 move_down:                          // move Y pos down
     inc missile_char_y,x
 check:
@@ -63,12 +63,12 @@ check:
     beq remove
     cmp #$1A
     beq remove
-    jmp end
+    jmp next
 remove:                             
     stx ZeroPage1
     remove_missile(ZeroPage1)    
 next:                               // go to the next one
-    inx
+    inx    
     cpx #max_missiles
     beq end
     jmp loop
@@ -76,7 +76,7 @@ end:
 }
 
 .macro remove_missile(index) {
-    ldx #index
+    ldx index
     lda #$00
     sta missile_enable,x    
 }

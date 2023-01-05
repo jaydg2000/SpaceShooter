@@ -22,7 +22,7 @@ main:
     player_init()
     load_screen()
     load_screen_colors()
-    enable_timer(timer_missile_move, $05)
+    enable_timer(timer_missile_move, $03)
     sei
 
     // fire missle
